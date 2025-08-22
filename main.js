@@ -50,10 +50,10 @@ const doc = new Document({
               alignment: AlignmentType.CENTER,
               children: [
                 new ImageRun({
-                  data: fs.readFileSync(path.join(__dirname, "assets/img/header-jk.png")),
+                  data: fs.readFileSync(path.join(__dirname, "assets/img/header-jk-final.png")),
                   transformation: {
                     width: 698,   // adjust as needed
-                    height: 124,  // adjust as needed
+                    height: 178,  // adjust as needed
                   },
                 }),
               ],
@@ -69,11 +69,42 @@ const doc = new Document({
               data: fs.readFileSync(path.join(__dirname, "assets/img/flex-row.png")),
               transformation: {
                 width: 698,   // adjust as needed
-                height: 80,  // adjust as needed
+                height: 98,  // adjust as needed
               },
             }),
           ],
         }),
+
+        /* ----- Company Details Table ----- */
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: "fixed",
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 10, type: WidthType.PERCENTAGE },
+                  children: [new Paragraph("Date")],
+                }),
+                new TableCell({
+                  width: { size: 40, type: WidthType.PERCENTAGE },
+                  children: [new Paragraph(new Date().toLocaleDateString())],
+                }),
+                new TableCell({
+                  width: { size: 15, type: WidthType.PERCENTAGE },
+                  children: [new Paragraph("Contact Person")],
+                }),
+                new TableCell({
+                  width: { size: 35, type: WidthType.PERCENTAGE },
+                  children: [new Paragraph("John Doe")],
+                }),
+              ],
+            }),
+          ],
+        }),
+
+        /* ----- Prices ----- */
+
         new Paragraph({
           alignment: AlignmentType.RIGHT,
           children: [
@@ -120,4 +151,5 @@ const doc = new Document({
   fs.writeFileSync(filePath, buffer);
 
   event.sender.send("docx-done", filePath);
+
 });
