@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Quotation Generator</title>
+  </head>
+  <body>
+    <h1>Quotation Generator</h1>
+
+    <label for="cost">Enter Equipment Cost:</label>
+    <input type="number" id="cost" placeholder="Enter amount" />
+    <button id="generate">Generate Quotation</button>
+
+    <script>
+      const { ipcRenderer } = require("electron");
+
+      document.getElementById("generate").addEventListener("click", () => {
+        const cost = parseFloat(document.getElementById("cost").value);
+        if (isNaN(cost)) {
+          alert("Please enter a valid number!");
+          return;
+        }
+        ipcRenderer.send("generate-docx", cost);
+      });
+    </script>
+  </body>
+</html>
