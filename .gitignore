@@ -1,0 +1,9 @@
+# Node/Electron
+node_modules/
+dist/
+out/
+build/
+*.log
+.env
+.DS_Store
+coverage/
