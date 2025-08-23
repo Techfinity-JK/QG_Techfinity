@@ -3,24 +3,49 @@
   <head>
     <meta charset="UTF-8">
     <title>Quotation Generator</title>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1>Quotation Generator</h1>
+    <section class="section-details">
+      <h1>Quotation Generator</h1>
+      <label for="client">Client:</label>
+      <input type="text" id="client" placeholder="Enter client name" /><br /><br />
+      <label for="address">Address:</label>
+      <input type="text" id="address" placeholder="Enter client address" /><br /><br />
+      <label for="person">Contact Person:</label>
+      <input type="text" id="person" placeholder="Enter contact person" /><br /><br />
+      <label for="number">Contact Number:</label>
+      <input type="text" id="number" placeholder="Enter contact number" /><br /><br />
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" placeholder="Enter email" /><br /><br />
+      <label for="cost">Enter Equipment Cost:</label>
+      <input type="number" id="cost" placeholder="Enter amount" /><br /><br />
+      <button id="generate">Generate Quotation</button>
+    </section>
 
-    <label for="cost">Enter Equipment Cost:</label>
-    <input type="number" id="cost" placeholder="Enter amount" />
-    <button id="generate">Generate Quotation</button>
 
     <script>
       const { ipcRenderer } = require("electron");
 
       document.getElementById("generate").addEventListener("click", () => {
         const cost = parseFloat(document.getElementById("cost").value);
+
         if (isNaN(cost)) {
           alert("Please enter a valid number!");
           return;
         }
-        ipcRenderer.send("generate-docx", cost);
+
+        // Collect all the details
+        const details = {
+          client: document.getElementById("client").value,
+          address: document.getElementById("address").value,
+          person: document.getElementById("person").value,
+          number: document.getElementById("number").value,
+          email: document.getElementById("email").value,
+          cost,
+        };
+
+        ipcRenderer.send("generate-docx", details);
       });
     </script>
   </body>

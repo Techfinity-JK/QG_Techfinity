@@ -1,0 +1,75 @@
+/* Reset some default spacing */
+body, h1, label, input, button {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Page background */
+body {
+  background: linear-gradient(135deg, #f9fafb, #eef2f7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px;
+  color: #333;
+}
+
+/* Title */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #222;
+  letter-spacing: 1px;
+}
+
+/* Form layout */
+label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #444;
+}
+
+input {
+  width: 300px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+/* Input hover/focus effects */
+input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.3);
+}
+
+/* Button */
+button {
+  margin-top: 25px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: #2563eb;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+/* Button hover/click effect */
+button:hover {
+  background: #1d4ed8;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+.section-details{
+    align-items: center;
+    height: fit-content;
+}

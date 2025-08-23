@@ -24,7 +24,15 @@ app.on("window-all-closed", () => {
 });
 
 // Listen for generate-docx event
-ipcMain.on("generate-docx", async (event, cost) => {
+ipcMain.on("generate-docx", async (event, details) => {
+  const {
+    client = "-",
+    address = "-",
+    person = "-",
+    number = "-",
+    email = "-",
+    cost,
+  } = details;
   const vat = cost * 0.12;
   const total = cost + vat;
 
@@ -76,32 +84,38 @@ const doc = new Document({
         }),
 
         /* ----- Company Details Table ----- */
+        
         new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          layout: "fixed",
+          width: { size: 100, type: WidthType.PERCENTAGE },  // ~6.5" usable width
+          layout: "fixed",                             // MUST be fixed
           rows: [
             new TableRow({
               children: [
-                new TableCell({
-                  width: { size: 10, type: WidthType.PERCENTAGE },
-                  children: [new Paragraph("Date")],
-                }),
-                new TableCell({
-                  width: { size: 40, type: WidthType.PERCENTAGE },
-                  children: [new Paragraph(new Date().toLocaleDateString())],
-                }),
-                new TableCell({
-                  width: { size: 15, type: WidthType.PERCENTAGE },
-                  children: [new Paragraph("Contact Person")],
-                }),
-                new TableCell({
-                  width: { size: 35, type: WidthType.PERCENTAGE },
-                  children: [new Paragraph("John Doe")],
-                }),
+                styledCell("Date", 10),                      
+                styledCell(new Date().toLocaleDateString(), 45), 
+                styledCell("Contact Person", 15),            
+                styledCell(person || "-", 30),                 
+              ],
+            }),
+            new TableRow({
+              children: [
+                styledCell("Client", 10),
+                styledCell(client || "-", 45),
+                styledCell("Contact Number", 15),
+                styledCell(number || "-", 30),
+              ],
+            }),
+            new TableRow({
+              children: [
+                styledCell("Address", 10),
+                styledCell(address || "-", 45),
+                styledCell("Email Address", 15),
+                styledCell(email || "-", 30),
               ],
             }),
           ],
         }),
+
 
         /* ----- Prices ----- */
 
@@ -151,5 +165,23 @@ const doc = new Document({
   fs.writeFileSync(filePath, buffer);
 
   event.sender.send("docx-done", filePath);
+
+  function styledCell(text, widthPercent) {
+    return new TableCell({
+      width: { size: widthPercent, type: WidthType.PERCENTAGE },
+      children: [
+        new Paragraph({
+          children: [
+            new TextRun({
+              text,
+              font: "Century Gothic",
+              size: 18,
+              bold: true,
+            }),
+          ],
+        }),
+      ],
+    });
+  }
 
 });
