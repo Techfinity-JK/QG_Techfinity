@@ -32,9 +32,33 @@ ipcMain.on("generate-docx", async (event, details) => {
     number = "-",
     email = "-",
     cost,
+    product = "ProductA", // Default product fallback
   } = details;
+
   const vat = cost * 0.12;
   const total = cost + vat;
+
+  // Map product keys to image file paths
+  const productImages = {
+    LX50: path.join(__dirname, "assets/img/device/lx50.png"),
+    TX628: path.join(__dirname, "assets/img/device/tx628.png"),
+    SC700: path.join(__dirname, "assets/img/device/sc700.png"),
+    T8: path.join(__dirname, "assets/img/device/t8.png"),
+    FA1000: path.join(__dirname, "assets/img/device/fa1000.png"),
+    BK100: path.join(__dirname, "assets/img/device/bk100.png"),
+    FA110: path.join(__dirname, "assets/img/device/fa110.png"),
+    F22: path.join(__dirname, "assets/img/device/f22.png"),
+    SF200: path.join(__dirname, "assets/img/device/sf200.png"),
+    IFACE3: path.join(__dirname, "assets/img/device/iface3.png"),
+    MB460: path.join(__dirname, "assets/img/device/mb460.png"),
+    FA210: path.join(__dirname, "assets/img/device/fa210.png"),
+    XFACE100: path.join(__dirname, "assets/img/device/xface100.png"),
+    MB560VL: path.join(__dirname, "assets/img/device/mb560vl.png"),
+    UFACE800: path.join(__dirname, "assets/img/device/uface800.png"),
+  };
+
+  // Pick the correct image (fallback to ProductA if missing)
+  const selectedImagePath = productImages[product] || productImages["ProductA"];
 
 const doc = new Document({
   sections: [
@@ -116,6 +140,20 @@ const doc = new Document({
           ],
         }),
 
+        /* ----- Product Image Here ----- */
+
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new ImageRun({
+              data: fs.readFileSync(selectedImagePath),
+              transformation: {
+                width: 400,   // adjust as needed
+                height: 300,  // adjust as needed
+              },
+            }),
+          ],
+        }),
 
         /* ----- Prices ----- */
 

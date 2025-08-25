@@ -18,6 +18,25 @@
       <input type="text" id="number" placeholder="Enter contact number" /><br /><br />
       <label for="email">Email Address:</label>
       <input type="email" id="email" placeholder="Enter email" /><br /><br />
+      <label for="product">Select Product:</label>
+      <select id="product">
+        <option value="LX50">LX50</option>
+        <option value="TX628">TX628</option>
+        <option value="SC700">SC700</option>
+        <option value="T8">T8</option>
+        <option value="FA1000">FA1000</option>
+        <option value="BK100">BK100</option>
+        <option value="FA110">FA110</option>
+        <option value="F22">F22</option>
+        <option value="SF200">SF200</option>
+        <option value="IFACE3">IFACE3</option>
+        <option value="MB460">MB460</option>
+        <option value="FA210">FA210</option>
+        <option value="XFACE100">XFACE100</option>
+        <option value="MB560VL">MB560VL</option>
+        <option value="UFACE800">UFACE800</option>
+
+      </select><br /><br />
       <label for="cost">Enter Equipment Cost:</label>
       <input type="number" id="cost" placeholder="Enter amount" /><br /><br />
       <button id="generate">Generate Quotation</button>
@@ -43,6 +62,7 @@
           number: document.getElementById("number").value,
           email: document.getElementById("email").value,
           cost,
+          product: document.getElementById("product").value,
         };
 
         ipcRenderer.send("generate-docx", details);
