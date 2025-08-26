@@ -18,6 +18,7 @@
       <input type="text" id="number" placeholder="Enter contact number" /><br /><br />
       <label for="email">Email Address:</label>
       <input type="email" id="email" placeholder="Enter email" /><br /><br />
+      
       <label for="product">Select Product:</label>
       <select id="product">
         <option value="LX50">LX50</option>
@@ -35,8 +36,11 @@
         <option value="XFACE100">XFACE100</option>
         <option value="MB560VL">MB560VL</option>
         <option value="UFACE800">UFACE800</option>
-
       </select><br /><br />
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" placeholder="Quantity" /><br /><br />
+
       <label for="cost">Enter Equipment Cost:</label>
       <input type="number" id="cost" placeholder="Enter amount" /><br /><br />
       <button id="generate">Generate Quotation</button>
@@ -47,22 +51,25 @@
       const { ipcRenderer } = require("electron");
 
       document.getElementById("generate").addEventListener("click", () => {
-        const cost = parseFloat(document.getElementById("cost").value);
+        // allow blank cost (use product default)
+        const costRaw = document.getElementById("cost").value.trim();
+        const cost =
+          costRaw === "" ? null : Number(costRaw);
 
-        if (isNaN(cost)) {
-          alert("Please enter a valid number!");
+        if (costRaw !== "" && !Number.isFinite(cost)) {
+          alert("Please enter a valid number for cost.");
           return;
         }
 
-        // Collect all the details
         const details = {
           client: document.getElementById("client").value,
           address: document.getElementById("address").value,
           person: document.getElementById("person").value,
           number: document.getElementById("number").value,
           email: document.getElementById("email").value,
-          cost,
           product: document.getElementById("product").value,
+          quantity: Number(document.getElementById("quantity").value) || 1,
+          cost, // can be null -> backend will use product default
         };
 
         ipcRenderer.send("generate-docx", details);
