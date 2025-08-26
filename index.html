@@ -8,17 +8,26 @@
   <body>
     <section class="section-details">
       <h1>Quotation Generator</h1>
+
+      <label for="agent">Agent:</label>
+      <select id="agent">
+        <option value="CLEO">CLEO</option>
+        <option value="JHEL">JHEL</option>
+        <option value="JK">JK</option>
+        <option value="SHAE">SHAE</option>
+      </select>
+
       <label for="client">Client:</label>
-      <input type="text" id="client" placeholder="Enter client name" /><br /><br />
+      <input type="text" id="client" placeholder="Enter client name" />
       <label for="address">Address:</label>
-      <input type="text" id="address" placeholder="Enter client address" /><br /><br />
+      <input type="text" id="address" placeholder="Enter client address" />
       <label for="person">Contact Person:</label>
-      <input type="text" id="person" placeholder="Enter contact person" /><br /><br />
+      <input type="text" id="person" placeholder="Enter contact person" />
       <label for="number">Contact Number:</label>
-      <input type="text" id="number" placeholder="Enter contact number" /><br /><br />
+      <input type="text" id="number" placeholder="Enter contact number" />
       <label for="email">Email Address:</label>
-      <input type="email" id="email" placeholder="Enter email" /><br /><br />
-      
+      <input type="email" id="email" placeholder="Enter email" />
+
       <label for="product">Select Product:</label>
       <select id="product">
         <option value="LX50">LX50</option>
@@ -36,10 +45,10 @@
         <option value="XFACE100">XFACE100</option>
         <option value="MB560VL">MB560VL</option>
         <option value="UFACE800">UFACE800</option>
-      </select><br /><br />
+      </select>
 
       <label for="quantity">Quantity:</label>
-      <input type="number" id="quantity" placeholder="Quantity" /><br /><br />
+      <input type="number" id="quantity" placeholder="Quantity" />
 
       <label for="cost">Enter Equipment Cost:</label>
       <input type="number" id="cost" placeholder="Enter amount" /><br /><br />
@@ -62,6 +71,7 @@
         }
 
         const details = {
+          agent: document.getElementById("agent").value,
           client: document.getElementById("client").value,
           address: document.getElementById("address").value,
           person: document.getElementById("person").value,
