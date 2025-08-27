@@ -1,7 +1,25 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const { Document, Section, Packer, Paragraph, TextRun, AlignmentType, ImageRun, Header, Table, TableRow, TableCell, WidthType, PageMargin, PageOrientation, HeightRule, Tab} = require("docx");
+const {
+  Document,
+  Section,
+  Packer,
+  Paragraph,
+  TextRun,
+  Tab,
+  AlignmentType,
+  VerticalAlign,
+  ImageRun,
+  Header,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+  PageMargin,
+  PageOrientation,
+  HeightRule,
+} = require("docx");
 
 
 function createWindow() {
@@ -26,22 +44,24 @@ app.on("window-all-closed", () => {
 // Listen for generate-docx event
 ipcMain.on("generate-docx", async (event, details) => {
   const {
-    agent,
+    agent,          // 👈 Sales Agent
     client = "-",
     address = "-",
     person = "-",
     number = "-",
     email = "-",
     product,
-    quantity, // to be used later
-    cost,      // 👈 user override
+    quantity,       // 👈 No. of Biometrics
+    vatType,        // 👈 "VAT Inclusive/Exclusive"
+    cost,           // 👈 "Custom Amount for i.e. Dealers Price"
   } = details;
 
    // Map product values
   const productValues = {
     LX50:     {image: path.join(__dirname, "assets/img/device/lx50.png"),
                undiscounted: "₱10,900.00",
-               price: 5700, 
+               price: 5700,
+               warranty: 18,
                description:`~ 500 User capacity
                             ~ 500 Fingerprint capacity
                             ~ 50,000 transaction logs capacity
@@ -52,6 +72,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     TX628:    {image: path.join(__dirname, "assets/img/device/tx628.png"), 
                undiscounted: "₱14,900.00",
                price: 8900,
+               warranty: 36,
                description:`~ 3,200 User capacity
                             ~ 3,200 Fingerprint capacity
                             ~120,000 transaction logs capacity
@@ -65,6 +86,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     SC700:    {image: path.join(__dirname, "assets/img/device/sc700.png"),
                undiscounted: "₱10,800.00",
                price: 8800,
+               warranty: 18,
                description:`~ 30,000 Card Capacity
                             ~ 100,000 Logs Capacity
                             ~ Network Connectivity/ USB Host
@@ -76,6 +98,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     T8:       {image: path.join(__dirname, "assets/img/device/t8.png"),
                undiscounted: "₱15,900.00",
                price: 11200,
+               warranty: 36,
                description:`~ 3000 Fingerprint capacity
                             ~ 3000 card capacity
                             ~ 100,000 transaction logs capacity
@@ -90,6 +113,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     FA1000:   {image: path.join(__dirname, "assets/img/device/fa1000.png"),
                undiscounted: "₱12,500.00",
                price: 9200,
+               warranty: 18,
                description:`~  4.3 inch Touch Screen  
                             ~ 1,000 User Capacity
                             ~ 500 Face Capacity
@@ -102,6 +126,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     BK100:    {image: path.join(__dirname, "assets/img/device/bk100.png"), 
                undiscounted: "₱16,500.00",
                price: 9000,
+               warranty: 36,
                description:`~ 1000 User Capacity
                             ~ 800 Face Capacity
                             ~ 3,000 fingerprint templates capacity
@@ -114,6 +139,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     FA110:    {image: path.join(__dirname, "assets/img/device/fa110.png"),
                undiscounted: "₱17,900.00",
                price: 9700,
+               warranty: 36,
                description:`~ 2.8 Inch TFT Screen
                             ~ 500 Face Capacity
                             ~ 500 fingerprint templates capacity
@@ -127,6 +153,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     F22:      {image: path.join(__dirname, "assets/img/device/f22.png"),
                undiscounted: "₱19,800.00",
                price: 13900,
+               warranty: 36,
                description:`~ 3000 fingerprint templates
                             ~ 5,000 card capacity
                             ~ 50,000 transaction logs capacity
@@ -142,6 +169,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     SF200:    {image: path.join(__dirname, "assets/img/device/sf200.png"), 
                undiscounted: "₱17,500.00",
                price: 15700,
+               warranty: 36,
                description:`~ 2000 Fingerprint Templates Capacity
                             ~ 5,000 Card Capacity
                             ~ 100,000 Transaction logs Capacity
@@ -154,6 +182,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     IFACE3:   {image: path.join(__dirname, "assets/img/device/iface3.png"),
                undiscounted: "₱19,400.00",
                price: 14200,
+               warranty: 36,
                description:`~ 1,500 Face Capacity
                             ~ 4,000 fingerprint templates capacity
                             ~ 5,000 Card Capacity
@@ -166,6 +195,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     MB460:    {image: path.join(__dirname, "assets/img/device/mb460.png"), 
                undiscounted: "₱18,500.00",
                price: 14800,
+               warranty: 36,
                description:`~ 1,500 Face Capacity
                             ~ 2,000 fingerprint templates capacity
                             ~ 5000 Card Capacity
@@ -179,6 +209,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     FA210:    {image: path.join(__dirname, "assets/img/device/fa210.png"),
                undiscounted: "₱22,500.00",
                price: 14800,
+               warranty: 36,
                description:`~ 1,500 Face Capacity
                             ~ 2,000 fingerprint templates capacity
                             ~ 100,000 transaction logs capacity
@@ -190,6 +221,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     XFACE100: {image: path.join(__dirname, "assets/img/device/xface100.png"),
                undiscounted: "₱22,500.00",
                price: 18900,
+               warranty: 36,
                description:`~ 1,500 Face Capacity
                             ~ 2,000 fingerprint templates capacity
                             ~ 100,000 transaction logs capacity
@@ -202,6 +234,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     MB560VL:  {image: path.join(__dirname, "assets/img/device/mb560vl.png"), 
                undiscounted: "₱27,000.00",
                price: 21800,
+               warranty: 36,
                description:`~ 2.8” TFT Screen
                             ~ 1,500 face templates capacity
                             ~ 2,000 fingerprint templates capacity
@@ -214,6 +247,7 @@ ipcMain.on("generate-docx", async (event, details) => {
     UFACE800: {image: path.join(__dirname, "assets/img/device/uface800.png"),
                undiscounted: "₱32,900.00",
                price: 22800,
+               warranty: 36,
                description:`~ Touchscreen display with heat-sensitive function keys
                             ~ 3000 face templates capacity
                             ~ 4,000 fingerprint templates capacity
@@ -224,6 +258,11 @@ ipcMain.on("generate-docx", async (event, details) => {
                             ~ built-in scheduler bell
                             ~ Dimension: 194x165x86mm
                             ~ 36 MONTHS WARRANTY`
+              },
+    TMD95E:   {image: path.join(__dirname, "assets/img/device/tmd95e.png"),
+               undiscounted: "₱9,500.00",
+               price: 9500,
+               warranty: 12,
               },
   };
 
@@ -240,8 +279,10 @@ ipcMain.on("generate-docx", async (event, details) => {
   const selectedImagePath = catalogItem.image;
   // Get description from selected product
   const deviceDescription = productValues[product].description
-    // Get undiscounted price from selected product
+  // Get undiscounted price from selected product
   const undiscountedPrice = productValues[product].undiscounted
+  // Get warranty from selected product
+  const warranty = productValues[product].warranty || 12; // fallback 12 months
 
   // Function to format number as Philippine Peso
   const formatPeso = (value) =>
@@ -265,24 +306,26 @@ const doc = new Document({
               },
               orientation: PageOrientation.PORTRAIT,
           },
+          titlePage: true,
       },
       headers: {
-        default: new Header({
+        first: new Header({
           children: [
             new Paragraph({
               alignment: AlignmentType.CENTER,
               children: [
                 new ImageRun({
-                  data: fs.readFileSync(path.join(__dirname, "assets/img/header-jk-final.png")),
+                  data: fs.readFileSync(path.join(__dirname, getAgentCard(agent))),
                   transformation: {
                     width: 698,   // adjust as needed
-                    height: 178,  // adjust as needed
+                    height: 168,  // adjust as needed
                   },
                 }),
               ],
             }),
           ],
         }),
+        default: new Header({children: []}),
       },
       children: [
         new Paragraph({
@@ -367,17 +410,18 @@ const doc = new Document({
                 styledCellWhite("Qty", 5, false),
                 styledCellWhite("Unit", 9, false),
                 styledCellWhite("Unit price", 13, false),
-                styledCellWhite("Promo Amount", 13, true),
+                styledCellPromoAmount(`Promo
+                                      Amount`, 13, true),
               ],
             }),
             new TableRow({
               children: [
                 styledCellImage(selectedImagePath, 20, product, true),
                 styledCellDescription(deviceDescription, 40, false, AlignmentType.LEFT),
-                styledCell(String(quantity), 5, false, AlignmentType.CENTER),
-                styledCell("pc", 9, false, AlignmentType.CENTER),
-                styledCell(String(undiscountedPrice), 13, false, AlignmentType.CENTER),
-                styledCell(String(formatPeso(finalCost)), 13, true, AlignmentType.CENTER),           
+                styledCellCenter(String(quantity), 5, false, AlignmentType.CENTER),
+                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+                styledCellCenter(String(undiscountedPrice), 13, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(finalCost)), 13, true, AlignmentType.CENTER),           
               ],
             }),
             new TableRow({
@@ -442,16 +486,75 @@ const doc = new Document({
             }),
           ],
         }),
+        new Paragraph({ text: "" }),
 
         /* ----- Conforme Signature ----- */
 
 
 
 
-        /* ----- Terms & Conditions ----- */
+        /* ----- Optional Accessories ----- */
+
+        new Paragraph({          
+          children: [
+            new TextRun({
+              text: "OPTIONAL ACCESSORIES",
+              font: "Century Gothic",
+              size: 18,
+              bold: true,
+            }),
+          ],
+        }),
 
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: "fixed",
+          rows: [
+            new TableRow({
+              height: { value: 500, rule: HeightRule.EXACT },
+              children: [
+                styledCellWhite("Model", 20, false),
+                styledCellWhite("Item Description", 40, false),
+                styledCellWhite("Qty", 5, false),
+                styledCellWhite("Unit", 9, false),
+                styledCellWhite("Unit price", 13, false),
+                styledCellPromoAmount(`Promo
+                                      Amount`, 13, true),
+              ],
+            }),
+            new TableRow({
+              children: [
+                styledCellImage(productValues.TMD95E.image, 20, "TMD95E", true),
+                styledCellDescription(`Model: TDM95E
+                                      Communication: USB 1.1
+                                      USB: Type-C
+                                      Temperature Detection: Distance 3 - 5cm
+                                      Temperature: Unit °C or °F
+                                      Temperature: Measurement Range 32.0°C - 42.9°C / 89.6°F - 109.22°F
+                                      Temperature Measurement Deviation: ±0.3°C / ±0.54°F
+                                      Digital Display: Tube 4
+                                      Operating Voltage: 5V
+                                      Operating Temperature: 15°C - 35°C / 59°F - 95°F
+                                      Operating Humidity: 10% - 85%
+                                      Dimensions: 88 * 88 * 54.63 (mm)
+                                      Weight of the Device: 0.17kg
+                                      Weight of the Device with Packaging: 0.29kg
+                                      `, 40, false, AlignmentType.LEFT),
+                styledCellCenter(String(quantity), 5, false, AlignmentType.CENTER),
+                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(9500)), 13, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(9500)), 13, true, AlignmentType.CENTER),           
+              ],
+            }),
+          ],
+        }),
+        new Paragraph({ text: "" }),
+
+
+        /* ----- Terms & Conditions ----- */
+
+        new Table({
+          width: { size: 96, type: WidthType.PERCENTAGE },
           layout: "fixed",
           rows: [
             new TableRow({
@@ -468,6 +571,10 @@ const doc = new Document({
                   children: [
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "TERMS & CONDITIONS:",
@@ -479,9 +586,13 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
-                          text: "1.) Prices quoted above are VAT Exclusive. Email or fax certification if your company is vat exempt and zero rated for billing preparation.",
+                          text: "1.) Prices quoted above are VAT Inclusive. Email or fax certification if your company is vat exempt and zero rated for billing preparation.",
                           font: "Century Gothic",
                           size: 18,
                           bold: false,
@@ -490,6 +601,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "2.) Prices are subject to change without prior notice. Validity for this quotation is 15 days from the date stated above.",
@@ -501,6 +616,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "3.) Payment terms is Fifty Percent (50%) upon P.O. or signing of this CONFORME.  Remaining balance shall be paid upon receive of items or after the installation. ",
@@ -512,6 +631,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "4. Payment will be accepted in CASH, COD, and Dated Check or thru Bank Transfer payable to ",
@@ -523,6 +646,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "TECHFINITY SECURITY DEVICE TRADING.",
@@ -534,6 +661,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "5. FREE DELIVERY for purchases above Php10, 000 within Metro Manila, otherwise additional Php 500 delivery fee depending on location.",
@@ -545,6 +676,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "6. Cancelled orders are subject to a cancellation charge of Fifty Percent (50%).",
@@ -556,9 +691,13 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
-                          text: "7. Up to three (3) years limited warranty in service and parts will be given for main equipment from date of purchase/delivery/installation. Accessories such as power supply, adaptor, magnetic lock, exit button have six (6) months warranty. The warranty covers the parts cause of factory defect not including upgrades and relocation. Unauthorized repair will void its warranty. Warranty claims is strictly carried in basis, client must send the item to our office for repair. For those with installation, we will do the onsite checking and troubleshooting for free within metro manila, for outside metro manila client will pay for the mobilization/demobilization cost.  ",
+                          text: `7. Up to ${productValues[product].warranty} months limited warranty in service and parts will be given for main equipment from date of purchase/delivery/installation. Accessories such as power supply, adaptor, magnetic lock, exit button have six (6) months warranty. The warranty covers the parts cause of factory defect not including upgrades and relocation. Unauthorized repair will void its warranty. Warranty claims is strictly carried in basis, client must send the item to our office for repair. For those with installation, we will do the onsite checking and troubleshooting for free within metro manila, for outside metro manila client will pay for the mobilization/demobilization cost.`,
                           font: "Century Gothic",
                           size: 18,
                           bold: false,
@@ -567,6 +706,10 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                      },
                       children: [
                         new TextRun({
                           text: "8. Should client will require service unit while defective device is under repair; client must pay a service unit fee but depends on the availability of the service unit.",
@@ -578,6 +721,12 @@ const doc = new Document({
                     }),
                     new Paragraph({
                       alignment: AlignmentType.LEFT,
+                      spacing: {
+                        line: 238,   // 1.08 * 216 twips
+                        lineRule: "exactly",
+                        after: 238,
+                        before: 0,
+                      },
                       children: [
                         new TextRun({
                           text: "9. After sales support is from Monday – Friday 8:30 – 5:30 pm",
@@ -604,6 +753,7 @@ const doc = new Document({
             }),
           ],
         }),
+        new Paragraph({ text: "" }),
         new Paragraph({
           alignment: AlignmentType.LEFT,
           children: [
@@ -642,6 +792,33 @@ const doc = new Document({
     },
   ],
 });
+
+
+
+
+
+
+
+// Helper to generate Quote Reference based on agent code
+function getAgentCard(agent) {
+  if (!agent) return 'assets/img/header-jk-final.png';
+  
+  if (agent == "CLEO") {
+    return `assets/img/header-jk-final.png`;
+  } 
+  else if (agent == "JHEL") {
+    return `assets/img/header-jhel-final.png`;
+  }
+  else if (agent == "JK") {
+    return `assets/img/header-jk-final.png`;
+  }
+  else if (agent == "SHAE") {
+    return `assets/img/header-jk-final.png`;
+  }
+  else {
+    return "assets/img/header-jk-final.png";
+  }
+}
 
 // Helper to generate Quote Reference based on agent code
 function generateQuoteRef(agent) {
@@ -698,11 +875,31 @@ function getAgentNumber(agent) {
   }
 }
 
-
 // Helper to create styled table cell
 function styledCell(text, widthPercent, boldBool, alignmentType) {
   return new TableCell({
     width: { size: widthPercent, type: WidthType.PERCENTAGE },
+    children: [
+      new Paragraph({
+        alignment: alignmentType,
+        children: [
+          new TextRun({
+            text,
+            font: "Century Gothic",
+            size: 18,
+            bold: boldBool,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// Helper to create styled table cell Centered Vertically
+function styledCellCenter(text, widthPercent, boldBool, alignmentType) {
+  return new TableCell({
+    width: { size: widthPercent, type: WidthType.PERCENTAGE },
+    verticalAlign: VerticalAlign.CENTER,
     children: [
       new Paragraph({
         alignment: alignmentType,
@@ -743,6 +940,35 @@ function styledCellWhite(text, widthPercent) {
         ],
       }),
     ],
+  });
+}
+
+function styledCellPromoAmount(text, widthPercent, boldBool) {
+  // Split text into lines (handles both \n and template literal breaks)
+  const lines = String(text ?? "").split(/\r?\n/);
+
+  return new TableCell({
+    width: { size: widthPercent, type: WidthType.PERCENTAGE },
+    shading: {
+      type: "clear",
+      fill: "0070C0", // Blue background
+      color: "auto",
+    },
+    verticalAlign: "top", // descriptions usually align to the top
+    children: lines.map(line =>
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new TextRun({
+            text: line.trim(), // trim spaces
+            font: "Century Gothic",
+            color: "FFFFFF",
+            size: 18,
+            bold: boldBool,
+          }),
+        ],
+      })
+    ),
   });
 }
 
