@@ -284,11 +284,14 @@ ipcMain.on("generate-docx", async (event, details) => {
   // user override
   const userCost = typeof cost === "number" && Number.isFinite(cost) ? cost : null;
   const catalogItem = productValues[product] ?? productValues["LX50"]; // fallback
+  const discountedPrice = userCost !== null ? userCost : catalogItem.price;
   const finalCost = userCost !== null
     ? quantity * userCost
     : quantity * catalogItem.price;
   const vat = finalCost * 0.12;
   const total = finalCost + vat;
+  const widthImage = 100;
+  const heightImage = 100;
 
   // Get image path for selected product
   const selectedImagePath = catalogItem.image;
@@ -412,55 +415,9 @@ const doc = new Document({
           ],
          }),
         new Paragraph({ text: "" }),
+        
         /* ----- Biometrics Table Here ----- */
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          layout: "fixed",
-          rows: [
-            new TableRow({
-              height: { value: 500, rule: HeightRule.EXACT },
-              children: [
-                styledCellWhite("Model", 20, false),
-                styledCellWhite("Item Description", 40, false),
-                styledCellWhite("Qty", 5, false),
-                styledCellWhite("Unit", 9, false),
-                styledCellWhite("Unit price", 13, false),
-                styledCellPromoAmount(`Promo
-                                      Amount`, 13, true),
-              ],
-            }),
-            new TableRow({
-              children: [
-                styledCellImage(selectedImagePath, 20, product, true),
-                styledCellDescription(deviceDescription, 40, false, AlignmentType.LEFT),
-                styledCellCenter(String(quantity), 5, false, AlignmentType.CENTER),
-                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
-                styledCellCenter(String(undiscountedPrice), 13, false, AlignmentType.CENTER),
-                styledCellCenter(String(formatPeso(finalCost)), 13, true, AlignmentType.CENTER),           
-              ],
-            }),
-            new TableRow({
-              children: [
-                styledCell("Software", 20, false, AlignmentType.CENTER),
-                styledCell(" ZKTeco Attendance Management", 40, false, AlignmentType.LEFT),
-                styledCell(String(quantity), 5, false, AlignmentType.CENTER),
-                styledCell("License", 9, false, AlignmentType.CENTER),
-                styledCell("Free", 13, false, AlignmentType.CENTER),
-                styledCell("Free", 13, true, AlignmentType.CENTER),           
-              ],
-            }),
-            new TableRow({
-              children: [
-                styledCell("", 20, false),
-                styledCell(" 16GB USB FLASH DISK DRIVE", 40, false, AlignmentType.LEFT),
-                styledCell(String(quantity), 5, false, AlignmentType.CENTER),
-                styledCell("pc", 9, false, AlignmentType.CENTER),
-                styledCell("Free", 13, false, AlignmentType.CENTER),
-                styledCell("Free", 13, true, AlignmentType.CENTER),           
-              ],
-            }),
-          ],
-        }),
+        biometricsTable(quantity, selectedImagePath, product, deviceDescription, undiscountedPrice, finalCost, discountedPrice),
 
         /* ----- Prices ----- */
 
@@ -503,11 +460,6 @@ const doc = new Document({
         }),
         new Paragraph({ text: "" }),
 
-        /* ----- Conforme Signature ----- */
-
-
-
-
         /* ----- Optional Accessories ----- */
 
         new Paragraph({          
@@ -539,7 +491,7 @@ const doc = new Document({
             }),
             new TableRow({
               children: [
-                styledCellImage(productValues.TMD95E.image, 20, "TMD95E", true),
+                styledCellImage(productValues.TMD95E.image, 20, "TMD95E", true, 50, 50,),
                 styledCellDescription(`Model: TDM95E
                                       Communication: USB 1.1
                                       USB: Type-C
@@ -563,7 +515,7 @@ const doc = new Document({
             }),
             new TableRow({
               children: [
-                styledCellImage(productValues.RFID.image, 20, "", true),
+                styledCellImage(productValues.RFID.image, 20, "", true, 50, 50,),
                 styledCellCenter(` Proximity Card 125khz(Thin)`, 40, false, AlignmentType.LEFT),
                 styledCellCenter("1", 5, false, AlignmentType.CENTER),
                 styledCellCenter("pc", 9, false, AlignmentType.CENTER),
@@ -573,7 +525,7 @@ const doc = new Document({
             }),
             new TableRow({
               children: [
-                styledCellImage(productValues.UPS5.image, 20, "", true),
+                styledCellImage(productValues.UPS5.image, 20, "", true, 50, 50,),
                 styledCellCenter(` 5v Mini Ups`, 40, false, AlignmentType.LEFT),
                 styledCellCenter("1", 5, false, AlignmentType.CENTER),
                 styledCellCenter("pc", 9, false, AlignmentType.CENTER),
@@ -583,7 +535,7 @@ const doc = new Document({
             }),
             new TableRow({
               children: [
-                styledCellImage(productValues.UPS12.image, 20, "", true),
+                styledCellImage(productValues.UPS12.image, 20, "", true, 50, 50,),
                 styledCellCenter(` 12v Mini Ups`, 40, false, AlignmentType.LEFT),
                 styledCellCenter("1", 5, false, AlignmentType.CENTER),
                 styledCellCenter("pc", 9, false, AlignmentType.CENTER),
@@ -596,6 +548,43 @@ const doc = new Document({
         new Paragraph({ text: "" }),
         new Paragraph({ text: "" }),
 
+        /* ----- Conforme Signature ----- */
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new TextRun({
+              text: `							    CONFORME`,
+              font: "Century Gothic",
+              size: 18, //9pt
+              bold: false,
+            }),
+          ],
+        }),
+        new Paragraph({ text: "" }),
+        new Paragraph({ text: "" }),
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new TextRun({
+              text: `							    BY: _____________________________`,
+              font: "Century Gothic",
+              size: 18, //9pt
+              bold: false,
+            }),
+          ],
+        }),
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new TextRun({
+              text: `    							           Signature over Printed Name`,
+              font: "Century Gothic",
+              size: 18, //9pt
+              bold: false,
+            }),
+          ],
+        }),
+        new Paragraph({ text: "" }),
 
         /* ----- Terms & Conditions ----- */
 
@@ -843,8 +832,6 @@ const doc = new Document({
 
 
 
-
-
 // Helper to generate Quote Reference based on agent code
 function getAgentCard(agent) {
   if (!agent) return 'assets/img/header-jk-final.png';
@@ -1000,7 +987,7 @@ function styledCellPromoAmount(text, widthPercent, boldBool) {
       fill: "0070C0", // Blue background
       color: "auto",
     },
-    verticalAlign: "top", // descriptions usually align to the top
+    verticalAlign: "center",
     children: lines.map(line =>
       new Paragraph({
         alignment: AlignmentType.CENTER,
@@ -1018,7 +1005,7 @@ function styledCellPromoAmount(text, widthPercent, boldBool) {
   });
 }
 
-function styledCellImage(imagePath, widthPercent, caption = "", boldBool) {
+function styledCellImage(imagePath, widthPercent, caption = "", boldBool, widthImage, heightImage) {
   return new TableCell({
     width: { size: widthPercent, type: WidthType.PERCENTAGE },
     verticalAlign: "center",
@@ -1029,8 +1016,8 @@ function styledCellImage(imagePath, widthPercent, caption = "", boldBool) {
           new ImageRun({
             data: fs.readFileSync(imagePath),
             transformation: {
-              width: 100,   // adjust thumbnail size
-              height: 100,
+              width: widthImage,   // adjust thumbnail size
+              height: heightImage,
             },
           }),
         ],
@@ -1061,7 +1048,7 @@ function styledCellDescription(text, widthPercent, boldBool, alignment) {
 
   return new TableCell({
     width: { size: widthPercent, type: WidthType.PERCENTAGE },
-    verticalAlign: "top", // descriptions usually align to the top
+    verticalAlign: "center",
     children: lines.map(line =>
       new Paragraph({
         alignment,
@@ -1076,6 +1063,112 @@ function styledCellDescription(text, widthPercent, boldBool, alignment) {
       })
     ),
   });
+}
+
+// Setup table depending on quantity
+function biometricsTable(quantity, selectedImagePath, product, deviceDescription, undiscountedPrice, finalCost, discountedPrice) {
+  if (quantity > 1) {
+    // Example: custom table for multiple units
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      layout: "fixed",
+      rows: [
+        new TableRow({
+          height: { value: 500, rule: HeightRule.EXACT },
+          children: [
+            styledCellWhite("Model", 20, false),
+            styledCellWhite("Item Description", 30, false),
+            styledCellWhite("Qty", 4, false),
+            styledCellWhite("Unit", 10, false),
+            styledCellWhite("Unit price", 12, false),
+            styledCellPromoAmount("Promo Amount", 12, true),
+            styledCellPromoAmount("Total Amount", 12, true),
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCellImage(selectedImagePath, 20, product, true, 100, 100),
+            styledCellDescription(deviceDescription, 30, false, AlignmentType.LEFT),
+            styledCellCenter(String(quantity), 4, false, AlignmentType.CENTER),
+            styledCellCenter("pc", 10, false, AlignmentType.CENTER),
+            styledCellCenter(String(undiscountedPrice), 12, false, AlignmentType.CENTER),
+            styledCellCenter(String(formatPeso(discountedPrice)), 12, false, AlignmentType.CENTER),
+            styledCellCenter(String(formatPeso(finalCost)), 12, true, AlignmentType.CENTER),           
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCell("Software", 20, false, AlignmentType.CENTER),
+            styledCell("ZKTeco Attendance Management", 30, false, AlignmentType.LEFT),
+            styledCell(String(quantity), 4, false, AlignmentType.CENTER),
+            styledCell("License", 10, false, AlignmentType.CENTER),
+            styledCell("Free", 12, false, AlignmentType.CENTER),
+            styledCell("Free", 12, true, AlignmentType.CENTER),
+            styledCell("Free", 12, true, AlignmentType.CENTER),           
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCell("", 20, false),
+            styledCell("16GB USB FLASH DISK DRIVE", 30, false, AlignmentType.LEFT),
+            styledCell(String(quantity), 5, false, AlignmentType.CENTER),
+            styledCell("pc", 10, false, AlignmentType.CENTER),
+            styledCell("Free", 12, false, AlignmentType.CENTER),
+            styledCell("Free", 12, true, AlignmentType.CENTER),     
+            styledCell("Free", 12, true, AlignmentType.CENTER),         
+          ],
+        }),
+      ],
+    });
+  } else {
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      layout: "fixed",
+      rows: [
+        new TableRow({
+          height: { value: 500, rule: HeightRule.EXACT },
+          children: [
+            styledCellWhite("Model", 20, false),
+            styledCellWhite("Item Description", 40, false),
+            styledCellWhite("Qty", 5, false),
+            styledCellWhite("Unit", 9, false),
+            styledCellWhite("Unit price", 13, false),
+            styledCellPromoAmount("Promo Amount", 13, true),
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCellImage(selectedImagePath, 20, product, true, 100, 100),
+            styledCellDescription(deviceDescription, 40, false, AlignmentType.LEFT),
+            styledCellCenter(String(quantity), 5, false, AlignmentType.CENTER),
+            styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+            styledCellCenter(String(undiscountedPrice), 13, false, AlignmentType.CENTER),
+            styledCellCenter(String(formatPeso(finalCost)), 13, true, AlignmentType.CENTER),           
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCell("Software", 20, false, AlignmentType.CENTER),
+            styledCell("ZKTeco Attendance Management", 40, false, AlignmentType.LEFT),
+            styledCell(String(quantity), 5, false, AlignmentType.CENTER),
+            styledCell("License", 9, false, AlignmentType.CENTER),
+            styledCell("Free", 13, false, AlignmentType.CENTER),
+            styledCell("Free", 13, true, AlignmentType.CENTER),           
+          ],
+        }),
+        new TableRow({
+          children: [
+            styledCell("", 20, false),
+            styledCell("16GB USB FLASH DISK DRIVE", 40, false, AlignmentType.LEFT),
+            styledCell(String(quantity), 5, false, AlignmentType.CENTER),
+            styledCell("pc", 9, false, AlignmentType.CENTER),
+            styledCell("Free", 13, false, AlignmentType.CENTER),
+            styledCell("Free", 13, true, AlignmentType.CENTER),           
+          ],
+        }),
+      ],
+    });
+  }
 }
 
   const buffer = await Packer.toBuffer(doc);
