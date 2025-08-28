@@ -259,10 +259,25 @@ ipcMain.on("generate-docx", async (event, details) => {
                             ~ Dimension: 194x165x86mm
                             ~ 36 MONTHS WARRANTY`
               },
-    TMD95E:   {image: path.join(__dirname, "assets/img/device/tmd95e.png"),
+    TMD95E:   {image: path.join(__dirname, "assets/img/accessories/tmd95e.png"),
                undiscounted: "₱9,500.00",
                price: 9500,
                warranty: 12,
+              },
+    RFID:     {image: path.join(__dirname, "assets/img/accessories/rfid-card-125.png"),
+                undiscounted: "₱80.00",
+                price: 80,
+                warranty: 12,
+              },
+    UPS5:    {image: path.join(__dirname, "assets/img/accessories/mini-ups.jpg"),
+                undiscounted: "₱2500.00",
+                price: 2500,
+                warranty: 12,
+              },
+    UPS12:    {image: path.join(__dirname, "assets/img/accessories/mini-ups.jpg"),
+                undiscounted: "₱3500.00",
+                price: 3500,
+                warranty: 12,
               },
   };
 
@@ -427,7 +442,7 @@ const doc = new Document({
             new TableRow({
               children: [
                 styledCell("Software", 20, false, AlignmentType.CENTER),
-                styledCell("ZKTeco Attendance Management", 40, false, AlignmentType.LEFT),
+                styledCell(" ZKTeco Attendance Management", 40, false, AlignmentType.LEFT),
                 styledCell(String(quantity), 5, false, AlignmentType.CENTER),
                 styledCell("License", 9, false, AlignmentType.CENTER),
                 styledCell("Free", 13, false, AlignmentType.CENTER),
@@ -437,7 +452,7 @@ const doc = new Document({
             new TableRow({
               children: [
                 styledCell("", 20, false),
-                styledCell("16GB USB FLASH DISK DRIVE", 40, false, AlignmentType.LEFT),
+                styledCell(" 16GB USB FLASH DISK DRIVE", 40, false, AlignmentType.LEFT),
                 styledCell(String(quantity), 5, false, AlignmentType.CENTER),
                 styledCell("pc", 9, false, AlignmentType.CENTER),
                 styledCell("Free", 13, false, AlignmentType.CENTER),
@@ -546,8 +561,39 @@ const doc = new Document({
                 styledCellCenter(String(formatPeso(9500)), 13, true, AlignmentType.CENTER),           
               ],
             }),
+            new TableRow({
+              children: [
+                styledCellImage(productValues.RFID.image, 20, "", true),
+                styledCellCenter(` Proximity Card 125khz(Thin)`, 40, false, AlignmentType.LEFT),
+                styledCellCenter("1", 5, false, AlignmentType.CENTER),
+                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(80)), 13, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(80)), 13, true, AlignmentType.CENTER),           
+              ],
+            }),
+            new TableRow({
+              children: [
+                styledCellImage(productValues.UPS5.image, 20, "", true),
+                styledCellCenter(` 5v Mini Ups`, 40, false, AlignmentType.LEFT),
+                styledCellCenter("1", 5, false, AlignmentType.CENTER),
+                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(2500)), 13, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(2500)), 13, true, AlignmentType.CENTER),           
+              ],
+            }),
+            new TableRow({
+              children: [
+                styledCellImage(productValues.UPS12.image, 20, "", true),
+                styledCellCenter(` 12v Mini Ups`, 40, false, AlignmentType.LEFT),
+                styledCellCenter("1", 5, false, AlignmentType.CENTER),
+                styledCellCenter("pc", 9, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(3500)), 13, false, AlignmentType.CENTER),
+                styledCellCenter(String(formatPeso(3500)), 13, true, AlignmentType.CENTER),           
+              ],
+            }),
           ],
         }),
+        new Paragraph({ text: "" }),
         new Paragraph({ text: "" }),
 
 
